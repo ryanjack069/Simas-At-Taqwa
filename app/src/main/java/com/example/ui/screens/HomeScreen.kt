@@ -458,12 +458,7 @@ fun AdminEditForm(viewModel: JadwalViewModel, jadwalList: List<Jadwal>, uniqueNa
         ) {
             Text("Simpan Perubahan", fontSize = MaterialTheme.typography.titleMedium.fontSize)
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "*Catatan: Tombol simpan ada di bagian ini. Jika ingin mengubah PIN Admin (standar: 1234), ini perlu disesuaikan bersama dengan sistem database Kemenag/Google Script Anda.",
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
-        )
+
     }
 }
 
