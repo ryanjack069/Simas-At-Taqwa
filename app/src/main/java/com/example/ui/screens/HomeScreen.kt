@@ -24,13 +24,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.model.Jadwal
 import com.example.viewmodel.JadwalViewModel
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import com.example.R
 
 val GreenPrimary = Color(0xFF1B5E20)
 val GreenSecondary = Color(0xFF2E7D32)
 val GoldAccent = Color(0xFFFFB300)
 val BackgroundCream = Color(0xFFF1F8E9)
 
-enum class AppScreen { Home, Admin }
+enum class AppScreen { Home, Jadwal, Admin }
 
 @Composable
 fun HomeScreen(viewModel: JadwalViewModel) {
@@ -56,11 +59,10 @@ fun HomeScreen(viewModel: JadwalViewModel) {
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.AccountBalance,
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_masjid),
                             contentDescription = "Logo",
-                            modifier = Modifier.size(36.dp),
-                            tint = GreenPrimary
+                            modifier = Modifier.size(36.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
@@ -100,6 +102,17 @@ fun HomeScreen(viewModel: JadwalViewModel) {
                     )
                 )
                 NavigationBarItem(
+                    icon = { Icon(Icons.Default.DateRange, contentDescription = "Jadwal") },
+                    label = { Text("Jadwal", color = if (currentScreen == AppScreen.Jadwal) GreenPrimary else Color.Gray) },
+                    selected = currentScreen == AppScreen.Jadwal,
+                    onClick = { currentScreen = AppScreen.Jadwal },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = GreenPrimary,
+                        unselectedIconColor = Color.Gray,
+                        indicatorColor = BackgroundCream
+                    )
+                )
+                NavigationBarItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = "Admin") },
                     label = { Text("Admin", color = if (currentScreen == AppScreen.Admin) GreenPrimary else Color.Gray) },
                     selected = currentScreen == AppScreen.Admin,
@@ -118,31 +131,40 @@ fun HomeScreen(viewModel: JadwalViewModel) {
             .padding(padding)
             .fillMaxSize()) {
             
-            if (currentScreen == AppScreen.Home) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // HERO CARD
-                    if (isLoading && nextJadwal == null) {
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = GreenPrimary)
-                    } else if (nextJadwal != null) {
-                        HeroNextJadwal(nextJadwal!!)
+            when (currentScreen) {
+                AppScreen.Home -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        // HERO CARD
+                        if (isLoading && nextJadwal == null) {
+                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = GreenPrimary)
+                        } else if (nextJadwal != null) {
+                            HeroNextJadwal(nextJadwal!!)
+                        }
                     }
-
-                    // SEMUA JADWAL DI BAWAH DASHBOARD
-                    SearchAndListWidget(jadwalList)
                 }
-            } else {
-                // HALAMAN PENGATURAN ADMIN
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    AdminPage(viewModel, jadwalList, uniqueNames)
+                AppScreen.Jadwal -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        SearchAndListWidget(jadwalList)
+                    }
+                }
+                AppScreen.Admin -> {
+                    // HALAMAN PENGATURAN ADMIN
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        AdminPage(viewModel, jadwalList, uniqueNames)
+                    }
                 }
             }
         }
