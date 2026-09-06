@@ -1,18 +1,9 @@
-package com.example
+import re
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ui.screens.HomeScreen
-import com.example.ui.theme.MyApplicationTheme
-import com.example.viewmodel.JadwalViewModel
-import androidx.compose.runtime.LaunchedEffect
+with open('/app/applet/app/src/main/java/com/example/MainActivity.kt', 'r') as f:
+    content = f.read()
+
+new_imports = """import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,15 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.delay"""
 
-class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    enableEdgeToEdge()
-    setContent {
-      MyApplicationTheme {
-        Surface(
+content = content.replace("import com.example.viewmodel.JadwalViewModel", f"import com.example.viewmodel.JadwalViewModel\n{new_imports}")
+
+splash_logic = """        Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
@@ -69,8 +56,18 @@ class MainActivity : ComponentActivity() {
                 val viewModel: JadwalViewModel = viewModel()
                 HomeScreen(viewModel = viewModel)
             }
-        }
-      }
-    }
-  }
-}
+        }"""
+
+old_logic = """        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            val viewModel: JadwalViewModel = viewModel()
+            HomeScreen(viewModel = viewModel)
+        }"""
+
+content = content.replace(old_logic, splash_logic)
+
+with open('/app/applet/app/src/main/java/com/example/MainActivity.kt', 'w') as f:
+    f.write(content)
+
