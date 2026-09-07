@@ -14,7 +14,7 @@ android {
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.aistudio.jadwaljumat.abxz"
+    applicationId = "id.my.suburhariyanto.simasattaqwa"
     minSdk = 24
     targetSdk = 36
     versionCode = 1
@@ -25,18 +25,20 @@ android {
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
+      // Menggunakan file upload-keystore.jks milik Anda
+      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/upload-keystore.jks"
       storeFile = file(keystorePath)
+
+      // Catatan: Jika saat Build APK Release terjadi error password,
+      // ganti tulisan System.getenv("STORE_PASSWORD") di bawah ini
+      // dengan password Anda langsung, contoh: storePassword = "password123"
       storePassword = System.getenv("STORE_PASSWORD")
       keyAlias = "upload"
       keyPassword = System.getenv("KEY_PASSWORD")
     }
-    create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
-    }
+
+    // Blok konfigurasi debug buatan AI Studio SAYA HAPUS
+    // agar Android Studio menggunakan kunci bawaan laptop Anda dengan aman.
   }
 
   buildTypes {
@@ -46,8 +48,10 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
-    debug { signingConfig = signingConfigs.getByName("debugConfig") }
+    // Bagian ini saya KOSONGKAN agar error "debug.keystore not found" hilang
+    debug { }
   }
+
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
