@@ -65,6 +65,10 @@ fun HomeScreen(viewModel: JadwalViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     var currentScreen by remember { mutableStateOf(AppScreen.Home) }
 
+    BackHandler(enabled = currentScreen != AppScreen.Home) {
+        currentScreen = AppScreen.Home
+    }
+
     LaunchedEffect(updateStatus) {
         updateStatus?.let {
             snackbarHostState.showSnackbar(it)
@@ -248,73 +252,121 @@ fun HomeScreen(viewModel: JadwalViewModel) {
 fun HeroNextJadwal(jadwal: Jadwal) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = GreenPrimary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
-                LaunchedEffect(Unit) {
-                    while (true) {
-                        delay(1000)
-                        currentTime = System.currentTimeMillis()
-                    }
-                }
-                val dateFormat = java.text.SimpleDateFormat("EEEE, dd MMM yyyy", java.util.Locale("id", "ID"))
-                val timeFormat = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale("id", "ID"))
-                
-                Text(text = dateFormat.format(java.util.Date(currentTime)), color = Color.White.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall)
-                Text(text = timeFormat.format(java.util.Date(currentTime)), color = Color.White.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Event, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "JADWAL PETUGAS SHOLAT JUM'AT",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = GoldAccent,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            val pasaran = if (jadwal.jumat.isNotBlank()) " ${jadwal.jumat}" else ""
-            Text(
-                text = "Jumat$pasaran, ${jadwal.tanggal}",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                fontWeight = FontWeight.ExtraBold
+        Box {
+            // Background decoration
+            Icon(
+                painter = painterResource(id = R.drawable.logo_masjid),
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.05f),
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 50.dp, y = 50.dp)
             )
             
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                HeroRoleRow("Khotib", jadwal.khotib)
-                HeroRoleRow("Imam", jadwal.imam)
-                HeroRoleRow("Bilal", jadwal.bilal)
-                HeroRoleRow("Muadzin", jadwal.muadzin)
-                HeroRoleRow("MC", jadwal.pembawaAcara)
+            Column(modifier = Modifier.padding(24.dp)) {
+                // Header (Current Time)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            delay(1000)
+                            currentTime = System.currentTimeMillis()
+                        }
+                    }
+                    val dateFormat = java.text.SimpleDateFormat("EEEE, dd MMM yyyy", java.util.Locale("id", "ID"))
+                    val timeFormat = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale("id", "ID"))
+                    
+                    Column {
+                        Text(text = dateFormat.format(java.util.Date(currentTime)), color = Color.White.copy(alpha = 0.8f), style = MaterialTheme.typography.labelMedium)
+                        Text(text = timeFormat.format(java.util.Date(currentTime)), color = GoldAccent, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    }
+                    
+                    Box(
+                        modifier = Modifier
+                            .background(GoldAccent.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "JUM'AT INI",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = GoldAccent,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                // Date Title
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Event, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "JADWAL PETUGAS SHOLAT JUM'AT",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = GoldAccent,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                val pasaran = if (jadwal.jumat.isNotBlank()) " ${jadwal.jumat}" else ""
+                Text(
+                    text = "Jumat$pasaran",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Text(
+                    text = jadwal.tanggal,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontWeight = FontWeight.Medium
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Roles
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    HeroRoleRow("Khotib", jadwal.khotib, Icons.Default.Person)
+                    HeroRoleRow("Imam", jadwal.imam, Icons.Default.Person)
+                    HeroRoleRow("Bilal & Muadzin", "${jadwal.bilal} / ${jadwal.muadzin}", Icons.Default.Person)
+                    HeroRoleRow("MC", jadwal.pembawaAcara, Icons.Default.Person)
+                }
             }
         }
     }
 }
 
 @Composable
-fun HeroRoleRow(role: String, name: String) {
+fun HeroRoleRow(role: String, name: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = role, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.7f))
-        Text(text = name, style = MaterialTheme.typography.bodyLarge, color = Color.White, fontWeight = FontWeight.Bold)
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, contentDescription = null, tint = GoldAccent, modifier = Modifier.size(20.dp))
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = role, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.7f))
+            Text(text = name, style = MaterialTheme.typography.bodyLarge, color = Color.White, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
@@ -898,13 +950,13 @@ fun TakmirScreen() {
             }
         }
         
-        TakmirCard(title = "PENASEHAT", members = listOf("1. H. Mahbub Junaedi", "2. H. Shokib", "3. H. Undang Taufik", "4. H. Aris Prasetya", "5. H. Dzikron Sofyan", "6. Ust. Achmad Zuhri Syam", "7. Nanang Supriyanto", "8. Erfan Hanaki", "9. Ust. Imam Masruri"))
+        TakmirCard(title = "PENASEHAT", members = listOf("1. H. Mahbub Junaedi", "2. H. Undang Taufik", "3. H. Aris Prasetya", "4. H. Dzikron Sofyan", "5. Ust. Achmad Zuhri Syam", "6. Nanang Supriyanto", "7. Erfan Hanaki", "8. Ust. Imam Masruri"))
 
         // Bidang-bidang
         Text("BIDANG - BIDANG", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = GreenPrimary)
         
         TakmirCard(title = "PENDIDIKAN", members = listOf("1. Ust. M. Asy'ari", "2. Ust. M. Jiwandono", "3. Ismail", "4. Afifatum Munawaroh", "5. Nur Ida"))
-        TakmirCard(title = "DAKWAH & PHBI", members = listOf("1. Ust. M. Rosyid F.", "2. Ust. M. Husnan", "3. Ust. Imam Saeroji", "4. Ust. M. Qomari Miftakhul Munir", "5. Hasan Abdillah"))
+        TakmirCard(title = "DAKWAH & PHBI", members = listOf("1. Ust. H.M. Husnan", "2. Ust. Imam Safi'i", "3. Ust. Imam Saeroji", "4. Ust. M. Qomari Miftakhul Munir", "5. Hasan Abdillah"))
         TakmirCard(title = "BAZNAS DAN SOSIAL", members = listOf("1. Adi Purwanto", "2. Khoirul Anam", "3. Imam Agus Wahid", "4. Anggota Baznas"))
         TakmirCard(title = "KEAMANAN DAN KETERTIBAN", members = listOf("1. Nan Sugiono", "2. Junaedi", "3. So'im", "4. Dullah", "5. M. Rofik", "6. Mukhlis", "7. Budi Wahyono", "8. Ali Sutejo", "9. Elok"))
         TakmirCard(title = "HUMAS", members = listOf("1. Ahmadi", "2. Imron Hanafi", "3. Romli", "4. Asmat", "5. Ketua RW 20", "6. Ketua RW 19", "7. Ketua RW 23", "8. Ketua RW 22"))
@@ -912,8 +964,8 @@ fun TakmirScreen() {
         TakmirCard(title = "REHABILITASI BANGUNAN", members = listOf("1. H. Suharto", "2. M. Abdurrohim", "3. Sagi", "4. Masihi"))
         TakmirCard(title = "PEMELIHARAAN DAN PERAWATAN", members = listOf("1. Hadi Isnaeni", "2. Heru Purwoso", "3. Heru Purwoko", "4. Samin", "5. Tolahri"))
         TakmirCard(title = "PENDANAAN", members = listOf("1. M. Ijul Arifianto", "2. M. Nur Habibi", "3. Solikin", "4. M. Guntur Bahtiar"))
-        TakmirCard(title = "PEMBINAAN WANITA", members = listOf("1. Bu Mausufa", "2. Bu Ribut Eko Mujiati", "3. Anggota Relawan"))
-        TakmirCard(title = "DKM DEWAN KEBERSIHAN", members = listOf("1. Jawahir", "2. Sholeh", "3. Ikhwan", "4. Busar", "5. Ahmad Nurkholis"))
+        TakmirCard(title = "PEMBINAAN WANITA", members = listOf("1. Ribut Eko Mujiati", "2. B. Purwati", "3. B. Ririn"))
+        TakmirCard(title = "DKM DEWAN KEBERSIHAN", members = listOf("1. Ust. Jawahir", "2. Sholeh", "3. Ikhwan", "4. Busar", "5. Ahmad Nurkholis", "6. Rohmat"))
         TakmirCard(title = "MASYARAKAT", members = listOf())
         
         Spacer(modifier = Modifier.height(20.dp))
